@@ -1,0 +1,91 @@
+.captain-login-signup-main-box {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  /* padding: 24px; */
+}
+
+.captain-login-signup-box {
+  background-color: #000000;
+  /* padding: 8px 16px; */
+  display: flex;
+  align-items: center;
+  height: 4.5rem;
+  padding: 10px;
+  padding-left: 4rem;
+  margin-bottom: 24px;
+  /* border-radius: 8px; */
+}
+
+.captain-login-signup-title {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.captain-login-signup-form {
+  /* max-width: 400px;
+  margin: 0 auto; */
+  /* width: 30%;
+  align-self: center;
+  padding-top: 3rem; */
+
+  /* ////////////// */
+
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-top: 3rem;
+}
+
+.captain-login-signup-button {
+  background-color: #000000 !important;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-weight: bold !important;
+  margin-bottom: 8px;
+  text-transform: none;
+  height: 3.5rem;
+}
+
+.captain-login-social-media-button {
+  background-color: #00000080 !important;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-weight: bold !important;
+  text-transform: none;
+    height: 3.5rem;
+
+}
+
+.captain-login-social-media-button:hover {
+  background-color: #dddddd !important;
+  color: #000000 !important;
+}
+
+
+@media (min-width: 600px) {
+  .captain-login-signup-form {
+    width: 70%;
+  }
+}
+
+@media (min-width: 768px) {
+  .captain-login-signup-form {
+    width: 50%;
+  }
+}
+
+@media (min-width: 992px) {
+  .captain-login-signup-form {
+    width: 40%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .captain-login-signup-form {
+    width: 30%;
+  }
+}

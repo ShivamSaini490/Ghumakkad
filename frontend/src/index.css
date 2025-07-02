@@ -1,0 +1,26 @@
+/* @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white rounded-md px-6 py-3 font-bold text-base hover:bg-gray-200 hover:text-black transition;
+  }
+
+  .btn-social {
+    @apply bg-black/50 text-white rounded-md px-6 py-3 font-bold text-base hover:bg-gray-200 hover:text-black transition;
+  }
+
+  .heading-section {
+    @apply text-2xl font-bold text-black;
+  }
+
+  .heading-bar {
+    @apply bg-black text-white px-8 py-4 flex items-center;
+  }
+
+  .form-wrapper {
+    @apply w-[90%] max-w-[400px] mx-auto pt-12 sm:w-[70%] md:w-[50%] lg:w-[40%] xl:w-[30%];
+  }
+} */
