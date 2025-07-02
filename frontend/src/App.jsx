@@ -6,8 +6,7 @@ import CaptainLoginSignUp from './pages/captain/CaptainLoginSignUp'
 import UserLoginSignUp from './pages/user/UserLoginSignUp'
 
 const App = () => {
-   console.log("start");
-   
+
   return (
    <>
       <Routes>
