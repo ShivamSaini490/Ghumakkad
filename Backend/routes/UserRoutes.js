@@ -23,6 +23,10 @@ router.post('/login', [
 userController.loginUser
 );
 
+// Add these routes
+router.post('/request-otp', userController.requestOtp);
+router.post('/login-otp', userController.loginWithOtp);
+
 // Profile
 
 router.get('/profile', authmiddlewares.authUser, userController.profile);

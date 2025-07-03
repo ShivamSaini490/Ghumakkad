@@ -27,9 +27,13 @@ const userSchema = new mongoose.Schema({
     select: false,
     minlength: [6, 'Password must be atleast 6 characters'],
   },
-  socketId: {
-    type: String,
-  }
+  otp: {
+    code: String,
+    expires: Date,
+  },
+  // socketId: {
+  //   type: String,
+  // }
 })
 
 userSchema.methods.generateAuthToken = function () {
