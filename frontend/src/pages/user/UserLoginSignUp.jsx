@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 import "./UserLoginSignUp.css";
 import {
   Box,
@@ -19,6 +20,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 
 const UserLoginSignUp = ({ mode = "login" }) => {
   const isLogin = mode === "login";
+  const navigate = useNavigate(); // Add this line
   const [otpOpen, setOtpOpen] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -76,24 +78,31 @@ const UserLoginSignUp = ({ mode = "login" }) => {
     }
   };
 
-  const handleOtpSubmit = () => {
-    const otpValue = otp.join("");
-    if (otpValue === "123456") {
-      setOtpOpen(false);
-      alert(
-        `User ${
-          isLogin ? "logged in" : "signed up"
-        } successfully with: ${userInput}`
-      );
-    } else {
-      alert("Invalid OTP");
-    }
-  };
-
   const handleCloseOtp = () => {
     setOtp(["", "", "", "", "", ""]);
     setOtpOpen(false);
   };
+
+  const handleOtpSubmit = async () => {
+  const otpValue = otp.join("");
+  // Simulate OTP verification (replace with actual API in real use)
+  const isOtpValid = otpValue === "123456";
+
+  if (isOtpValid) {
+    setOtpOpen(false);
+
+    if (mode === "signup") {
+      // Redirect only if it's a signup
+      navigate("/profile", { state: { mode: "signup" } });
+    } else if (mode === "login") {
+      // Show welcome alert on login
+      alert("Welcome To The Dashboard");
+    }
+  } else {
+    alert("Invalid OTP");
+  }
+};
+
 
   const isEmail = (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.trim());
 
@@ -101,7 +110,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
     <Box className="user-login-signup-main-box">
       <Box className="user-login-signup-box">
         <Typography variant="h5" className="user-login-signup-title">
-          Ghumakkad User {isLogin ? "Login" : "Sign Up"}
+          Welcome To Ghumakkad User {isLogin ? "Login" : "Sign Up"}
         </Typography>
       </Box>
 
