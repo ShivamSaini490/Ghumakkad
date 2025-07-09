@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom";
 import "./UserLoginSignUp.css";
+import axios from "../../api/axios";
 import {
   Box,
   Button,
@@ -20,7 +21,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 
 const UserLoginSignUp = ({ mode = "login" }) => {
   const isLogin = mode === "login";
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate();
   const [otpOpen, setOtpOpen] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -49,22 +50,26 @@ const UserLoginSignUp = ({ mode = "login" }) => {
         });
       }, 1000);
     }
-
     return () => clearInterval(interval);
   }, [otpOpen]);
 
-  const handleResend = () => {
+  const handleResend = async () => {
+  try {
+    await axios.post('/auth/request-otp', { email: userInput });
     setOtp(["", "", "", "", "", ""]);
     setTimer(59);
     setIsResendEnabled(false);
-  };
+  } catch (err) {
+    alert("Failed to resend OTP");
+  }
+};
+
 
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
     if (value && index < 5) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) nextInput.focus();
@@ -85,24 +90,33 @@ const UserLoginSignUp = ({ mode = "login" }) => {
 
   const handleOtpSubmit = async () => {
   const otpValue = otp.join("");
-  // Simulate OTP verification (replace with actual API in real use)
-  const isOtpValid = otpValue === "123456";
+  try {
+    const res = await axios.post("/auth/verify-otp", {
+      email: userInput,
+      code: otpValue // ✅ correct key for backend
+    });
 
-  if (isOtpValid) {
     setOtpOpen(false);
-
     if (mode === "signup") {
-      // Redirect only if it's a signup
-      navigate("/profile", { state: { mode: "signup" } });
-    } else if (mode === "login") {
-      // Show welcome alert on login
+      navigate("/profile", { state: { email: userInput } });
+    } else {
       alert("Welcome To The Dashboard");
     }
-  } else {
-    alert("Invalid OTP");
+  } catch (error) {
+    alert(error.response?.data?.message || "Invalid OTP");
   }
 };
 
+
+  const handleFinalSubmit = async (values) => {
+    try {
+      await axios.post('/auth/request-otp', { email: values.input });
+      setUserInput(values.input);
+      setOtpOpen(true);
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to send OTP");
+    }
+  };
 
   const isEmail = (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.trim());
 
@@ -124,10 +138,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
         <Formik
           initialValues={{ input: "" }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            setUserInput(values.input);
-            setOtpOpen(true);
-          }}
+          onSubmit={handleFinalSubmit}
         >
           {({ values, handleChange, handleSubmit, touched, errors }) => (
             <form onSubmit={handleSubmit}>
@@ -169,8 +180,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
 
         <Typography variant="body2" sx={{ mt: 3, mb: 3, textAlign: "justify" }}>
           By proceeding, you consent to receive emails from Ghumakkad and its
-          partners at the provided email address. This includes updates on your
-          trip, offers, and promotions. You can opt out at any time.
+          partners at the provided email address.
         </Typography>
       </Box>
 
@@ -183,7 +193,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
       >
         <DialogContent className="otp-dialog">
           <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Enter the 4-digit code sent to you at:
+            Enter the 6-digit code sent to:
           </Typography>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
             {userInput}
@@ -205,10 +215,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
           </Box>
 
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Tip:{" "}
-            {isEmail(userInput)
-              ? "Make sure to check your inbox and spam folders."
-              : "Make sure your phone is on and has network coverage to receive the OTP."}
+            Tip: Check your inbox or spam folder for the code.
           </Typography>
 
           <Box className="otp-actions">

@@ -12,6 +12,8 @@ import {
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./Profile.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "../../api/axios"; // Make sure this matches your axios config
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -25,6 +27,34 @@ const validationSchema = Yup.object({
 });
 
 const Profile = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email;
+
+  if (!email) {
+    return (
+      <Typography variant="h6" sx={{ mt: 4, textAlign: "center" }}>
+        ⚠️ Missing email. Please go back and complete signup.
+      </Typography>
+    );
+  }
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await axios.post("/auth/signup-complete", {
+        email,
+        ...values,
+      });
+
+      alert("🎉 Account created successfully!");
+      navigate("/dashboard"); // Change if needed
+    } catch (error) {
+      alert(error.response?.data?.message || "Signup failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Box className="profile-main-box">
       <Box className="profile-header-box">
@@ -44,10 +74,7 @@ const Profile = () => {
             agree: false,
           }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            alert("Profile submitted successfully!");
-            console.log(values);
-          }}
+          onSubmit={handleSubmit}
         >
           {({ values, handleChange, errors, touched }) => (
             <Form>
@@ -122,12 +149,10 @@ const Profile = () => {
                         </a>{" "}
                         &{" "}
                         <a href="#" style={{ color: "#1976d2" }}>
-                          Review Privacy Notice
+                          Privacy Policy
                         </a>
                         .<br />
-                        By selecting "I Agree" below, I have reviewed and agree to
-                        the Terms of Use and acknowledge the Privacy Notice. I am
-                        at least 18 years of age.
+                        By clicking submit, you confirm you are 18+.
                       </Typography>
                     }
                   />
