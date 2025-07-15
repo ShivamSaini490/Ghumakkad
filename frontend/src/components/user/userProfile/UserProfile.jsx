@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import "./Profile.css";
+import "./UserProfile.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "../../api/axios"; // Make sure this matches your axios config
+import axios from "../../../api/axios"; // Make sure this matches your axios config
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -26,7 +26,7 @@ const validationSchema = Yup.object({
   agree: Yup.boolean().oneOf([true], "You must accept the terms"),
 });
 
-const Profile = () => {
+const UserProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email;
@@ -178,4 +178,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default UserProfile;

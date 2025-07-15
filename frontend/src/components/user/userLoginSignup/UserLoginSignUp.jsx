@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UserLoginSignUp.css";
-import axios from "../../api/axios";
+import axios from "../../../api/axios";
 import {
   Box,
   Button,
@@ -98,7 +98,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
 
     setOtpOpen(false);
     if (mode === "signup") {
-      navigate("/profile", { state: { email: userInput } });
+      navigate("/userprofile", { state: { email: userInput } });
     } else {
       alert("Welcome To The Dashboard");
     }

@@ -1,10 +1,10 @@
 import React from 'react'
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import CaptainLoginSignUp from './pages/captain/CaptainLoginSignUp'
-import UserLoginSignUp from './pages/user/UserLoginSignUp'
-import Profile from './pages/profile/Profile'
+import Home from './components/Home'
+import UserProfile from './components/user/userProfile/UserProfile'
+import UserLoginSignUp from './components/user/userLoginSignup/UserLoginSignUp'
+import CaptainLoginSignUp from './components/captain/captainLoginSignup/CaptainLoginSignUp';
 
 const App = () => {
 
@@ -16,7 +16,7 @@ const App = () => {
          <Route path='/user-signup' element={<UserLoginSignUp mode='signup'/>} />
          <Route path='/captain-login' element={<CaptainLoginSignUp />} />
          <Route path='/captain-signup' element={<CaptainLoginSignUp />} />
-         <Route path='/profile' element={<Profile />} />
+         <Route path='/userprofile' element={<UserProfile />} />
       </Routes>
    </>
   )
