@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./UserLoginSignUp.css";
+import "./UserLogin.css";
 import axios from "../../../api/axios";
 import {
   Box,
@@ -18,9 +18,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import GoogleIcon from "@mui/icons-material/Google";
+import { toast } from "react-toastify";
 
-const UserLoginSignUp = ({ mode = "login" }) => {
-  const isLogin = mode === "login";
+const UserLogin = () => {
   const navigate = useNavigate();
   const [otpOpen, setOtpOpen] = useState(false);
   const [userInput, setUserInput] = useState("");
@@ -54,16 +54,16 @@ const UserLoginSignUp = ({ mode = "login" }) => {
   }, [otpOpen]);
 
   const handleResend = async () => {
-  try {
-    await axios.post('/auth/request-otp', { email: userInput });
-    setOtp(["", "", "", "", "", ""]);
-    setTimer(59);
-    setIsResendEnabled(false);
-  } catch (err) {
-    alert("Failed to resend OTP");
-  }
-};
-
+    try {
+      await axios.post("/auth/request-otp", { email: userInput });
+      setOtp(["", "", "", "", "", ""]);
+      setTimer(59);
+      setIsResendEnabled(false);
+      toast.success("OTP resent successfully");
+    } catch (err) {
+      toast.error("Failed to resend OTP");
+    }
+  };
 
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
@@ -89,50 +89,41 @@ const UserLoginSignUp = ({ mode = "login" }) => {
   };
 
   const handleOtpSubmit = async () => {
-  const otpValue = otp.join("");
-  try {
-    const res = await axios.post("/auth/verify-otp", {
-      email: userInput,
-      code: otpValue // ✅ correct key for backend
-    });
-
-    setOtpOpen(false);
-    if (mode === "signup") {
-      navigate("/userprofile", { state: { email: userInput } });
-    } else {
-      alert("Welcome To The Dashboard");
-    }
-  } catch (error) {
-    alert(error.response?.data?.message || "Invalid OTP");
-  }
-};
-
-
-  const handleFinalSubmit = async (values) => {
+    const otpValue = otp.join("");
     try {
-      await axios.post('/auth/request-otp', { email: values.input });
-      setUserInput(values.input);
-      setOtpOpen(true);
+      await axios.post("/auth/verify-otp", {
+        email: userInput,
+        code: otpValue,
+      });
+      toast.success("🎉 Welcome to your dashboard!");
+      setOtpOpen(false);
+      navigate("/dashboard");
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to send OTP");
+      toast.error(error.response?.data?.message || "Invalid OTP");
     }
   };
 
-  const isEmail = (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.trim());
+  const handleFinalSubmit = async (values) => {
+    try {
+      await axios.post("/auth/request-otp", { email: values.input });
+      setUserInput(values.input);
+      setOtpOpen(true);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to send OTP");
+    }
+  };
 
   return (
-    <Box className="user-login-signup-main-box">
-      <Box className="user-login-signup-box">
-        <Typography variant="h5" className="user-login-signup-title">
-          Welcome To Ghumakkad User {isLogin ? "Login" : "Sign Up"}
+    <Box className="user-login-main-box">
+      <Box className="user-login-box">
+        <Typography variant="h5" className="user-login-title">
+          Welcome To Ghumakkad User Login
         </Typography>
       </Box>
 
-      <Box className="user-login-signup-form">
+      <Box className="user-login-form">
         <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-          {isLogin
-            ? "What's your email address to log in?"
-            : "Sign up with your email address"}
+          What's your email address to log in?
         </Typography>
 
         <Formik
@@ -157,7 +148,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                className="user-login-signup-button"
+                className="user-login-button"
               >
                 Continue
               </Button>
@@ -172,7 +163,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
             variant="contained"
             fullWidth
             startIcon={<GoogleIcon />}
-            className="user-login-social-media-button"
+            className="user-login-social-button"
           >
             Continue With Google
           </Button>
@@ -227,7 +218,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
               </Typography>
               <Button
                 variant="contained"
-                className="user-login-signup-button"
+                className="user-login-button"
                 disabled={!isResendEnabled}
                 onClick={handleResend}
               >
@@ -243,7 +234,7 @@ const UserLoginSignUp = ({ mode = "login" }) => {
                 variant="contained"
                 endIcon={<ArrowForwardIcon />}
                 onClick={handleOtpSubmit}
-                className="user-login-signup-button"
+                className="user-login-button"
                 disabled={otp.join("").length !== 6}
               >
                 Next
@@ -256,4 +247,4 @@ const UserLoginSignUp = ({ mode = "login" }) => {
   );
 };
 
-export default UserLoginSignUp;
+export default UserLogin;
