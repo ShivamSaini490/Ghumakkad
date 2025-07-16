@@ -16,7 +16,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./UserSignup.css";
 import axios from "../../../api/axios";
@@ -40,7 +40,8 @@ const profileValidationSchema = Yup.object({
 });
 
 const UserSignup = () => {
-  const [step, setStep] = useState("email"); // email, otp, profile
+  const [step, setStep] = useState("email"); // email → profile → success
+  const [otpOpen, setOtpOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(59);
@@ -48,7 +49,7 @@ const UserSignup = () => {
 
   useEffect(() => {
     let interval;
-    if (step === "otp") {
+    if (otpOpen) {
       setTimer(59);
       setIsResendEnabled(false);
       interval = setInterval(() => {
@@ -63,7 +64,7 @@ const UserSignup = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [step]);
+  }, [otpOpen]);
 
   const handleResend = async () => {
     try {
@@ -95,11 +96,16 @@ const UserSignup = () => {
     }
   };
 
+  const handleCloseOtp = () => {
+    setOtp(["", "", "", "", "", ""]);
+    setOtpOpen(false);
+  };
+
   const handleEmailSubmit = async (values) => {
     try {
       await axios.post("/auth/request-otp", { email: values.input });
       setUserEmail(values.input);
-      setStep("otp");
+      setOtpOpen(true);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to send OTP");
     }
@@ -110,6 +116,7 @@ const UserSignup = () => {
       const code = otp.join("");
       await axios.post("/auth/verify-otp", { email: userEmail, code });
       toast.success("OTP verified successfully");
+      setOtpOpen(false);
       setStep("profile");
     } catch (error) {
       toast.error(error.response?.data?.message || "Invalid OTP");
@@ -172,13 +179,98 @@ const UserSignup = () => {
           </Button>
 
           <Typography variant="body2" sx={{ mt: 3, textAlign: "justify" }}>
-            By proceeding, you consent to receive emails from Ghumakkad and its partners.
+            By proceeding, you consent to receive emails from Ghumakkad and its partners at the provided email address.
           </Typography>
         </Box>
       )}
 
-      {step === "otp" && (
+      {step === "profile" && (
         <Box className="signup-form-box">
+          <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+            Complete Your Profile
+          </Typography>
+          <Formik
+            initialValues={{
+              firstName: "",
+              lastName: "",
+              mobile: "",
+              gender: "",
+              dob: "",
+              agree: false,
+            }}
+            validationSchema={profileValidationSchema}
+            onSubmit={handleProfileSubmit}
+          >
+            {({ values, handleChange, errors, touched }) => (
+              <Form>
+                <Stack spacing={2}>
+                  <TextField name="firstName" label="First Name" fullWidth {...commonTextFieldProps(values, handleChange, errors, touched, "firstName")} />
+                  <TextField name="lastName" label="Last Name" fullWidth {...commonTextFieldProps(values, handleChange, errors, touched, "lastName")} />
+                  <TextField name="mobile" label="Mobile Number" fullWidth {...commonTextFieldProps(values, handleChange, errors, touched, "mobile")} />
+                  <TextField
+                    name="gender"
+                    label="Gender"
+                    select
+                    fullWidth
+                    value={values.gender}
+                    onChange={handleChange}
+                    error={touched.gender && Boolean(errors.gender)}
+                    helperText={touched.gender && errors.gender}
+                  >
+                    <MenuItem value="Male">Male</MenuItem>
+                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </TextField>
+                  <TextField
+                    name="dob"
+                    label="Date of Birth"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    value={values.dob}
+                    onChange={handleChange}
+                    error={touched.dob && Boolean(errors.dob)}
+                    helperText={touched.dob && errors.dob}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="agree"
+                        checked={values.agree}
+                        onChange={handleChange}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        Accept Ghumakkad's <a href="#" style={{ color: "#1976d2" }}>Terms</a> & <a href="#" style={{ color: "#1976d2" }}>Privacy Policy</a>. By clicking submit, you confirm you are 18+.
+                      </Typography>
+                    }
+                  />
+                  {touched.agree && Boolean(errors.agree) && (
+                    <Typography variant="caption" color="error">
+                      {errors.agree}
+                    </Typography>
+                  )}
+                  <Button type="submit" variant="contained" className="signup-button">
+                    Submit
+                  </Button>
+                </Stack>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      )}
+
+      {step === "success" && (
+        <Typography variant="h6" sx={{ mt: 5, textAlign: "center", color: "green" }}>
+          ✅ Signup completed successfully. 🎉 Welcome to Dashboard !
+        </Typography>
+      )}
+
+      {/* OTP Dialog */}
+      <Dialog open={otpOpen} onClose={(event, reason) => reason !== "backdropClick" && handleCloseOtp()}>
+        <DialogContent className="otp-dialog">
           <Typography variant="h6" fontWeight="bold" gutterBottom>
             Enter the 6-digit code sent to:
           </Typography>
@@ -212,13 +304,18 @@ const UserSignup = () => {
                   ? "You can now resend the code"
                   : `Resend in 00:${timer < 10 ? `0${timer}` : timer}`}
               </Typography>
-              <Button onClick={handleResend} disabled={!isResendEnabled} className="signup-button">
+              <Button
+                variant="contained"
+                className="signup-button"
+                disabled={!isResendEnabled}
+                onClick={handleResend}
+              >
                 Resend
               </Button>
             </Box>
 
             <Box className="otp-next-box">
-              <IconButton onClick={() => setStep("email")}>
+              <IconButton onClick={handleCloseOtp}>
                 <ArrowBackIcon />
               </IconButton>
               <Button
@@ -232,121 +329,17 @@ const UserSignup = () => {
               </Button>
             </Box>
           </Box>
-        </Box>
-      )}
-
-      {step === "profile" && (
-        <Box className="signup-form-box">
-          <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-            Complete Your Profile
-          </Typography>
-          <Formik
-            initialValues={{
-              firstName: "",
-              lastName: "",
-              mobile: "",
-              gender: "",
-              dob: "",
-              agree: false,
-            }}
-            validationSchema={profileValidationSchema}
-            onSubmit={handleProfileSubmit}
-          >
-            {({ values, handleChange, errors, touched }) => (
-              <Form>
-                <Stack spacing={2}>
-                  <TextField
-                    name="firstName"
-                    label="First Name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    error={touched.firstName && Boolean(errors.firstName)}
-                    helperText={touched.firstName && errors.firstName}
-                    fullWidth
-                  />
-                  <TextField
-                    name="lastName"
-                    label="Last Name"
-                    value={values.lastName}
-                    onChange={handleChange}
-                    error={touched.lastName && Boolean(errors.lastName)}
-                    helperText={touched.lastName && errors.lastName}
-                    fullWidth
-                  />
-                  <TextField
-                    name="mobile"
-                    label="Mobile Number"
-                    value={values.mobile}
-                    onChange={handleChange}
-                    error={touched.mobile && Boolean(errors.mobile)}
-                    helperText={touched.mobile && errors.mobile}
-                    fullWidth
-                  />
-                  <TextField
-                    name="gender"
-                    label="Gender"
-                    select
-                    value={values.gender}
-                    onChange={handleChange}
-                    error={touched.gender && Boolean(errors.gender)}
-                    helperText={touched.gender && errors.gender}
-                    fullWidth
-                  >
-                    <MenuItem value="Male">Male</MenuItem>
-                    <MenuItem value="Female">Female</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </TextField>
-                  <TextField
-                    name="dob"
-                    label="Date of Birth"
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    value={values.dob}
-                    onChange={handleChange}
-                    error={touched.dob && Boolean(errors.dob)}
-                    helperText={touched.dob && errors.dob}
-                    fullWidth
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="agree"
-                        checked={values.agree}
-                        onChange={handleChange}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <Typography variant="body2">
-                        Accept Ghumakkad's{" "}
-                        <a href="#" style={{ color: "#1976d2" }}>Terms</a> &{" "}
-                        <a href="#" style={{ color: "#1976d2" }}>Privacy Policy</a>.
-                        By clicking submit, you confirm you are 18+.
-                      </Typography>
-                    }
-                  />
-                  {touched.agree && Boolean(errors.agree) && (
-                    <Typography variant="caption" color="error">
-                      {errors.agree}
-                    </Typography>
-                  )}
-                  <Button type="submit" variant="contained" className="signup-button">
-                    Submit
-                  </Button>
-                </Stack>
-              </Form>
-            )}
-          </Formik>
-        </Box>
-      )}
-
-      {step === "success" && (
-        <Typography variant="h6" sx={{ mt: 5, textAlign: "center", color: "green" }}>
-          ✅ Signup completed successfully. You can now login!
-        </Typography>
-      )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
+
+const commonTextFieldProps = (values, handleChange, errors, touched, name) => ({
+  value: values[name],
+  onChange: handleChange,
+  error: touched[name] && Boolean(errors[name]),
+  helperText: touched[name] && errors[name],
+});
 
 export default UserSignup;

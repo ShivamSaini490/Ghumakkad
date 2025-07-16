@@ -55,7 +55,8 @@ const UserLogin = () => {
 
   const handleResend = async () => {
     try {
-      await axios.post("/auth/request-otp", { email: userInput });
+      await axios.post("/auth/request-otp", { email: values.input, mode: "login" });
+      toast.success("OTP resent successfully");
       setOtp(["", "", "", "", "", ""]);
       setTimer(59);
       setIsResendEnabled(false);
@@ -105,11 +106,16 @@ const UserLogin = () => {
 
   const handleFinalSubmit = async (values) => {
     try {
-      await axios.post("/auth/request-otp", { email: values.input });
+      await axios.post("/auth/request-otp", { email: values.input, mode: "login" });
+      toast.success("OTP sent successfully");
       setUserInput(values.input);
       setOtpOpen(true);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send OTP");
+      if (error.response?.status === 404) {
+        toast.error(error.response?.data?.message || "There is no account exist by this email address");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to send OTP");
+      }
     }
   };
 

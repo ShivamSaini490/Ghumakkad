@@ -5,6 +5,8 @@ import Home from './components/Home'
 import CaptainLoginSignUp from './components/captain/captainLoginSignup/CaptainLoginSignUp';
 import UserLogin from './components/user/login/UserLogin';
 import UserSignup from './components/user/signup/UserSignup';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
 
@@ -12,13 +14,12 @@ const App = () => {
    <>
       <Routes>
          <Route path='/' element={<Home />} />
-         {/* <Route path='/user-login' element={<UserLoginSignUp mode='login'/>} />
-         <Route path='/user-signup' element={<UserLoginSignUp mode='signup'/>} /> */}
          <Route path='/user-login' element={<UserLogin />} />
          <Route path='/user-signup' element={<UserSignup />} />
          <Route path='/captain-login' element={<CaptainLoginSignUp />} />
          <Route path='/captain-signup' element={<CaptainLoginSignUp />} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
    </>
   )
 }
