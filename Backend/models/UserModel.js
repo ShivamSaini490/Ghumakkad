@@ -102,7 +102,11 @@ const userSchema = new mongoose.Schema({
   otp: {
     code: String,
     expires: Date,
-  }
+  },
+  // emailVerify: {
+  //   type: Boolean,
+  //   default: false,
+  // },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -114,8 +118,10 @@ userSchema.statics.hashOTP = async function (otp) {
 };
 
 userSchema.statics.compareOTP = async function (otp, hashedOtp) {
+  if (!otp || !hashedOtp) return false; 
   return await bcrypt.compare(otp, hashedOtp);
 };
+
 
 const userModel = mongoose.model('user', userSchema);
 module.exports = userModel;

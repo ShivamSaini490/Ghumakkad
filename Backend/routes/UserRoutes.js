@@ -55,33 +55,21 @@
 // ====================================
 
 
-
-
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/UserControllers');
 const authMiddleware = require('../middlewares/AuthMiddlewares');
 
-// === OTP Auth Routes ===
-router.post('/auth/request-otp', userController.requestOtp);
+router.post('/auth/request-signup-otp', userController.signupWithOtp);
+router.post('/auth/request-login-otp', userController.loginWithOtp);
 router.post('/auth/verify-otp', userController.verifyOtp);
 router.post('/auth/signup-complete', userController.completeSignup);
+router.get('/logout', authMiddleware.authUser, userController.logoutUser);
 
-// === Protected Profile Route ===
 router.get('/profile', authMiddleware.authUser, (req, res) => {
   res.status(200).json(req.user);
 });
 
-// === Logout ===
-router.get('/logout', authMiddleware.authUser, async (req, res) => {
-  try {
-    const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
-    await require('../models/BlackListTokenModel').create({ token });
-    res.clearCookie("token");
-    res.status(200).json({ message: "Logged out successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Logout failed", error: err.message });
-  }
-});
+
 
 module.exports = router;
