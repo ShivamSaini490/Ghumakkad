@@ -10,24 +10,24 @@
 // const jwt = require('jsonwebtoken');
 
 // const userSchema = new mongoose.Schema({
-//   fullName: {
-//     firstName: {
-//       type: String,
-//       required: true,
-//       minlength: [3, 'First Name must be at least 3 characters']
-//     },
-//     lastName: {
-//       type: String,
-//       minlength: [3, 'Last Name must be at least 3 characters']
-//     }
-//   },
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//     lowercase: true,
-//     minlength: [5, 'Email must be atleast 5 characters long']
-//   },
+  // fullName: {
+  //   firstName: {
+  //     type: String,
+  //     required: true,
+  //     minlength: [3, 'First Name must be at least 3 characters']
+  //   },
+  //   lastName: {
+  //     type: String,
+  //     minlength: [3, 'Last Name must be at least 3 characters']
+  //   }
+  // },
+  // email: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  //   lowercase: true,
+  //   minlength: [5, 'Email must be atleast 5 characters long']
+  // },
 //   password: {
 //     type: String,
 //     required: true,
@@ -80,18 +80,28 @@ const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
   fullName: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: {
+      type: String,
+      required: true,
+      minlength: [3, 'First Name must be at least 3 characters']
+    },
+    lastName: {
+      type: String,
+      minlength: [3, 'Last Name must be at least 3 characters']
+    }
   },
-  email: {
+ email: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
+    minlength: [5, 'Email must be atleast 5 characters long']
   },
-  mobile: {
-    type: String,
-  },
+mobile: {
+  type: String,
+  unique: true,
+  sparse: true, // only enforces uniqueness on non-null values
+},
   gender: {
     type: String,
     enum: ['Male', 'Female']
@@ -122,6 +132,7 @@ userSchema.statics.compareOTP = async function (otp, hashedOtp) {
   return await bcrypt.compare(otp, hashedOtp);
 };
 
+userSchema.index({ mobile: 1 }, { unique: true, sparse: true });
 
 const userModel = mongoose.model('user', userSchema);
 module.exports = userModel;

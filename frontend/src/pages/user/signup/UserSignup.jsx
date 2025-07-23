@@ -344,14 +344,8 @@
 
 // export default UserSignup;
 
-
-
-
-
-
-
-import React, { useState, useEffect } from 'react';
-import './UserSignup.css';
+import React, { useState, useEffect } from "react";
+import "./UserSignup.css";
 
 import {
   Box,
@@ -364,29 +358,34 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
+  MenuItem,
+} from "@mui/material";
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-import { Formik } from 'formik';
+import { Formik } from "formik";
 import {
   userLoginSignupSchema,
   otpValidationSchema,
   userProfileSchema,
-} from '../../../validations/userValidation';
+} from "../../../validations/userValidation";
 
-import { requestSignupOtp, verifyOtp, completeSignup } from '../../../services/userService';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { startOtpTimer, formatTime } from '../../../utils/otpTimer';
+import {
+  requestSignupOtp,
+  verifyOtp,
+  completeSignup,
+} from "../../../services/userService";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { startOtpTimer, formatTime } from "../../../utils/otpTimer";
 
 const UserSignup = () => {
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1); // 1 = email, 2 = otp, 3 = profile
-  const [identifier, setIdentifier] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [identifier, setIdentifier] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [isResendEnabled, setIsResendEnabled] = useState(false);
   const [timerId, setTimerId] = useState(null);
@@ -404,14 +403,14 @@ const UserSignup = () => {
 
   const handleIdentifierSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log('Sending OTP to:', values);
-      
-      await requestSignupOtp(values.identifier, 'signup');
-      toast.success('OTP sent successfully');
+      console.log("Sending OTP to:", values);
+
+      await requestSignupOtp(values.identifier, "signup");
+      toast.success("OTP sent successfully");
       setIdentifier(values.identifier);
       setStep(2);
     } catch (err) {
-      toast.error(err.message || 'Failed to send OTP');
+      toast.error(err.message || "Failed to send OTP");
     } finally {
       setSubmitting(false);
     }
@@ -419,15 +418,15 @@ const UserSignup = () => {
 
   const handleResend = async () => {
     try {
-      await requestSignupOtp(identifier, 'signup');
-      toast.success('OTP resent');
-      setOtp(['', '', '', '', '', '']);
+      await requestSignupOtp(identifier, "signup");
+      toast.success("OTP resent");
+      setOtp(["", "", "", "", "", ""]);
       setIsResendEnabled(false);
       if (timerId) clearInterval(timerId);
       const id = startOtpTimer(setTimer, 60);
       setTimerId(id);
     } catch (err) {
-      toast.error(err.message || 'Failed to resend OTP');
+      toast.error(err.message || "Failed to resend OTP");
     }
   };
 
@@ -443,30 +442,30 @@ const UserSignup = () => {
   };
 
   const handleOtpKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       const prev = document.getElementById(`otp-${index - 1}`);
       if (prev) prev.focus();
     }
   };
 
   const handleOtpSubmit = async () => {
-    const code = otp.join('');
+    const code = otp.join("");
     try {
       await verifyOtp(identifier, code);
-      toast.success('OTP Verified');
+      toast.success("OTP Verified");
       setStep(3);
     } catch (err) {
-      toast.error(err.message || 'Invalid OTP');
+      toast.error(err.message || "Invalid OTP");
     }
   };
 
   const handleProfileSubmit = async (values, { setSubmitting }) => {
     try {
       await completeSignup({ ...values, email: identifier });
-      toast.success('Signup complete! 🎉');
-      navigate('/user/dashboard');
+      toast.success("Signup complete! 🎉");
+      navigate("/user/dashboard");
     } catch (err) {
-      toast.error(err.message || 'Signup failed');
+      toast.error(err.message || "Signup failed");
     } finally {
       setSubmitting(false);
     }
@@ -483,16 +482,23 @@ const UserSignup = () => {
       {/* Step 1: Email input */}
       {step === 1 && (
         <Box className="user-signup-form">
-          <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
             What’s your email address to sign up?
           </Typography>
 
           <Formik
-            initialValues={{ identifier: '' }}
+            initialValues={{ identifier: "" }}
             validationSchema={userLoginSignupSchema}
             onSubmit={handleIdentifierSubmit}
           >
-            {({ values, handleChange, handleSubmit, touched, errors, isSubmitting }) => (
+            {({
+              values,
+              handleChange,
+              handleSubmit,
+              touched,
+              errors,
+              isSubmitting,
+            }) => (
               <form onSubmit={handleSubmit}>
                 <TextField
                   fullWidth
@@ -520,14 +526,21 @@ const UserSignup = () => {
           <Divider sx={{ my: 2 }}>Or</Divider>
 
           <Stack spacing={1.5}>
-            <Button variant="contained" fullWidth className="user-signup-social-button">
+            <Button
+              variant="contained"
+              fullWidth
+              className="user-signup-social-button"
+            >
               Continue with Google
             </Button>
           </Stack>
 
-          <Typography variant="body2" sx={{ mt: 3, mb: 3, textAlign: 'justify' }}>
-            By proceeding, you consent to receive emails from Ghumakkad and its partners
-            at the provided email address.
+          <Typography
+            variant="body2"
+            sx={{ mt: 3, mb: 3, textAlign: "justify" }}
+          >
+            By proceeding, you consent to receive emails from Ghumakkad and its
+            partners at the provided email address.
           </Typography>
         </Box>
       )}
@@ -536,12 +549,18 @@ const UserSignup = () => {
       <Dialog
         open={step === 2}
         onClose={(e, reason) => {
-          if (reason !== 'backdropClick') setStep(1);
+          if (reason !== "backdropClick") setStep(1);
         }}
       >
-        <DialogTitle sx={{ textAlign: 'center' }}>Enter the 6‑digit code sent to</DialogTitle>
+        <DialogTitle sx={{ textAlign: "center" }}>
+          Enter the 6‑digit code sent to
+        </DialogTitle>
         <DialogContent className="otp-dialog">
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, textAlign: 'center' }}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{ mb: 2, textAlign: "center" }}
+          >
             {identifier}
           </Typography>
 
@@ -560,7 +579,7 @@ const UserSignup = () => {
             ))}
           </Box>
 
-          <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ mt: 1, textAlign: "center" }}>
             Tip: check your inbox or spam folder for the code.
           </Typography>
 
@@ -568,7 +587,7 @@ const UserSignup = () => {
             <Box className="otp-resend-box">
               <Typography variant="body2" color="textSecondary">
                 {isResendEnabled
-                  ? 'You can now resend the code'
+                  ? "You can now resend the code"
                   : `Resend in ${formatTime(timer)}`}
               </Typography>
               <Button
@@ -588,7 +607,7 @@ const UserSignup = () => {
               <Button
                 variant="contained"
                 endIcon={<ArrowForwardIcon />}
-                disabled={otp.join('').length !== 6}
+                disabled={otp.join("").length !== 6}
                 onClick={handleOtpSubmit}
                 className="user-signup-button"
               >
@@ -602,22 +621,29 @@ const UserSignup = () => {
       {/* Step 3: Profile Form */}
       {step === 3 && (
         <Box className="user-signup-form">
-          <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
             Complete your profile
           </Typography>
 
           <Formik
             initialValues={{
-              firstName: '',
-              lastName: '',
-              mobile: '',
-              gender: '',
-              dob: '',
+              firstName: "",
+              lastName: "",
+              mobile: "",
+              gender: "",
+              dob: "",
             }}
             validationSchema={userProfileSchema}
             onSubmit={handleProfileSubmit}
           >
-            {({ values, handleChange, handleSubmit, touched, errors, isSubmitting }) => (
+            {({
+              values,
+              handleChange,
+              handleSubmit,
+              touched,
+              errors,
+              isSubmitting,
+            }) => (
               <form onSubmit={handleSubmit}>
                 <TextField
                   fullWidth
@@ -663,18 +689,17 @@ const UserSignup = () => {
                   helperText={touched.gender && errors.gender}
                   sx={{ mb: 2 }}
                 >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
+                  <MenuItem value="">Select Gender</MenuItem>
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
                 </TextField>
-
                 <TextField
                   fullWidth
                   name="dob"
                   label="Date of Birth"
                   type="date"
                   InputLabelProps={{ shrink: true }}
-                  value={values.dob}  
+                  value={values.dob}
                   onChange={handleChange}
                   error={touched.dob && Boolean(errors.dob)}
                   helperText={touched.dob && errors.dob}
@@ -682,7 +707,7 @@ const UserSignup = () => {
                 />
 
                 <Box sx={{ mb: 2 }}>
-                  <label style={{ display: 'flex', alignItems: 'center' }}>
+                  <label style={{ display: "flex", alignItems: "center" }}>
                     <input
                       type="checkbox"
                       name="agree"
@@ -691,7 +716,15 @@ const UserSignup = () => {
                       style={{ marginRight: 8 }}
                     />
                     <Typography variant="body2">
-                      Accept Ghumakkad's <a href="#" style={{ color: '#1976d2' }}>Terms</a> & <a href="#" style={{ color: '#1976d2' }}>Privacy Policy</a>. By clicking submit, you confirm you are 18+.
+                      Accept Ghumakkad's{" "}
+                      <a href="#" style={{ color: "#1976d2" }}>
+                        Terms
+                      </a>{" "}
+                      &{" "}
+                      <a href="#" style={{ color: "#1976d2" }}>
+                        Privacy Policy
+                      </a>
+                      . By clicking submit, you confirm you are 18+.
                     </Typography>
                   </label>
                   {touched.agree && Boolean(errors.agree) && (
