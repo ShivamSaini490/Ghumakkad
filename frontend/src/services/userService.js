@@ -89,26 +89,56 @@ import {
 } from '../constants/routes';
 
 export const requestSignupOtp = async (email) => {
-  const response = await axios.post(BASE_URL + USER + SIGNUP, { email }, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await axios.post(BASE_URL + USER + SIGNUP, { email }, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message
+      ? { message: error.response.data.message }
+      : { message: "OTP request failed" };
+  }
 };
 
 export const requestLoginOtp = async (email) => {
-  const response = await axios.post(BASE_URL + USER + LOGIN, { email }, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await axios.post(BASE_URL + USER + LOGIN, { email }, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message
+      ? { message: error.response.data.message }
+      : { message: "OTP request failed" };
+  }
 };
 
 export const verifyOtp = async (email, code) => {
-  const response = await axios.post(BASE_URL + USER + VERIFY_OTP, { email, code }, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await axios.post(BASE_URL + USER + VERIFY_OTP, { email, code }, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message
+      ? { message: error.response.data.message }
+      : { message: "OTP verification failed" };
+  }
 };
 
 export const completeSignup = async (profileData) => {
-  const response = await axios.post(BASE_URL + USER + SIGNUP_COMPLETE + PROFILE, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await axios.post(BASE_URL + USER + SIGNUP_COMPLETE, profileData, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message
+      ? { message: error.response.data.message }
+      : { message: "Signup completion failed" };
+  }
 };
 
 export const fetchCurrentUser = async () => {
-  const response = await axios.get(BASE_URL + USER + PROFILE, { withCredentials: true });
-  return response.data;
+  try {
+    const response = await axios.get(BASE_URL + USER + PROFILE, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message
+      ? { message: error.response.data.message }
+      : { message: "Fetching user failed" };
+  }
 };

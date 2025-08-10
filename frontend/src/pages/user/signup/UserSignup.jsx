@@ -472,18 +472,18 @@ const UserSignup = () => {
   };
 
   return (
-    <Box className="user-signup-main-box">
-      <Box className="user-signup-box">
-        <Typography variant="h5" className="user-signup-title">
-          Welcome To Ghumakkad User Signup
+    <Box className="signup-container">
+      <Box className="signup-header">
+        <Typography variant="h5" className="signup-title">
+          Welcome To Ghumakkad User Sign Up
         </Typography>
       </Box>
 
       {/* Step 1: Email input */}
       {step === 1 && (
-        <Box className="user-signup-form">
+        <Box className="signup-form-box">
           <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-            What’s your email address to sign up?
+            Sign up with your email address
           </Typography>
 
           <Formik
@@ -503,7 +503,7 @@ const UserSignup = () => {
                 <TextField
                   fullWidth
                   name="identifier"
-                  label="Enter your email"
+                  label="Enter Your Email Address"
                   value={values.identifier}
                   onChange={handleChange}
                   error={touched.identifier && Boolean(errors.identifier)}
@@ -515,7 +515,7 @@ const UserSignup = () => {
                   variant="contained"
                   type="submit"
                   disabled={isSubmitting}
-                  className="user-signup-button"
+                  className="signup-button"
                 >
                   Continue
                 </Button>
@@ -525,22 +525,16 @@ const UserSignup = () => {
 
           <Divider sx={{ my: 2 }}>Or</Divider>
 
-          <Stack spacing={1.5}>
-            <Button
-              variant="contained"
-              fullWidth
-              className="user-signup-social-button"
-            >
-              Continue with Google
-            </Button>
-          </Stack>
-
-          <Typography
-            variant="body2"
-            sx={{ mt: 3, mb: 3, textAlign: "justify" }}
+          <Button
+            fullWidth
+            variant="contained"
+            className="signup-social"
           >
-            By proceeding, you consent to receive emails from Ghumakkad and its
-            partners at the provided email address.
+            Continue With Google
+          </Button>
+
+          <Typography variant="body2" sx={{ mt: 3, textAlign: "justify" }}>
+            By proceeding, you consent to receive emails from Ghumakkad and its partners at the provided email address.
           </Typography>
         </Box>
       )}
@@ -553,7 +547,7 @@ const UserSignup = () => {
         }}
       >
         <DialogTitle sx={{ textAlign: "center" }}>
-          Enter the 6‑digit code sent to
+          Enter the 6-digit code sent to
         </DialogTitle>
         <DialogContent className="otp-dialog">
           <Typography
@@ -580,7 +574,7 @@ const UserSignup = () => {
           </Box>
 
           <Typography variant="body2" sx={{ mt: 1, textAlign: "center" }}>
-            Tip: check your inbox or spam folder for the code.
+            Tip: Check your inbox or spam folder for the code.
           </Typography>
 
           <Box className="otp-actions">
@@ -588,13 +582,13 @@ const UserSignup = () => {
               <Typography variant="body2" color="textSecondary">
                 {isResendEnabled
                   ? "You can now resend the code"
-                  : `Resend in ${formatTime(timer)}`}
+                  : `Resend in 00:${timer < 10 ? `0${timer}` : timer}`}
               </Typography>
               <Button
                 variant="contained"
                 disabled={!isResendEnabled}
                 onClick={handleResend}
-                className="user-signup-button"
+                className="signup-button"
               >
                 Resend
               </Button>
@@ -609,7 +603,7 @@ const UserSignup = () => {
                 endIcon={<ArrowForwardIcon />}
                 disabled={otp.join("").length !== 6}
                 onClick={handleOtpSubmit}
-                className="user-signup-button"
+                className="signup-button"
               >
                 Next
               </Button>
@@ -620,9 +614,9 @@ const UserSignup = () => {
 
       {/* Step 3: Profile Form */}
       {step === 3 && (
-        <Box className="user-signup-form">
+        <Box className="signup-form-box">
           <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-            Complete your profile
+            Complete Your Profile
           </Typography>
 
           <Formik
@@ -632,6 +626,7 @@ const UserSignup = () => {
               mobile: "",
               gender: "",
               dob: "",
+              agree: false,
             }}
             validationSchema={userProfileSchema}
             onSubmit={handleProfileSubmit}
@@ -692,6 +687,7 @@ const UserSignup = () => {
                   <MenuItem value="">Select Gender</MenuItem>
                   <MenuItem value="Male">Male</MenuItem>
                   <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
                 </TextField>
                 <TextField
                   fullWidth
@@ -716,15 +712,7 @@ const UserSignup = () => {
                       style={{ marginRight: 8 }}
                     />
                     <Typography variant="body2">
-                      Accept Ghumakkad's{" "}
-                      <a href="#" style={{ color: "#1976d2" }}>
-                        Terms
-                      </a>{" "}
-                      &{" "}
-                      <a href="#" style={{ color: "#1976d2" }}>
-                        Privacy Policy
-                      </a>
-                      . By clicking submit, you confirm you are 18+.
+                      Accept Ghumakkad's <a href="#" style={{ color: "#1976d2" }}>Terms</a> & <a href="#" style={{ color: "#1976d2" }}>Privacy Policy</a>. By clicking submit, you confirm you are 18+.
                     </Typography>
                   </label>
                   {touched.agree && Boolean(errors.agree) && (
@@ -738,9 +726,9 @@ const UserSignup = () => {
                   variant="contained"
                   type="submit"
                   disabled={isSubmitting}
-                  className="user-signup-button"
+                  className="signup-button"
                 >
-                  Complete Signup
+                  Submit
                 </Button>
               </form>
             )}
