@@ -1,17 +1,15 @@
 // Starts a countdown timer for OTP (default 60 seconds)
 export const startOtpTimer = (setTimer, duration = 60) => {
   let timeLeft = duration;
-
   const intervalId = setInterval(() => {
     timeLeft -= 1;
     setTimer(timeLeft);
-
     if (timeLeft <= 0) {
       clearInterval(intervalId);
+      if (typeof window.onOtpTimerEnd === 'function') window.onOtpTimerEnd();
     }
   }, 1000);
-
-  return intervalId; // return id so it can be cleared manually if needed
+  return intervalId;
 };
 
 // Optional: format timer to MM:SS (for display purposes)
